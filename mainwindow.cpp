@@ -3,17 +3,46 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <QFileDialog>
+#include <QMessageBox>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    cv::Mat image = cv::imread("/Users/mac/Desktop/1.jpg");
-    cv::imshow("my image", image);
-    cv::waitKey(50000);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+void MainWindow::openImage()
+{
+    //declare FileOpName as the choosen opened file name
+    FileOpName = QFileDialog::getOpenFileName(this,
+                                    tr("Open File"), QDir::currentPath(),tr("Image Files (*.png *.jpg *.jpeg *.bmp)"));
+
+    //Check if FileOpName exist or not
+    if (!FileOpName.isEmpty()) {
+        QImage image(FileOpName);
+        if (image.isNull()) {
+            QMessageBox::information(this, tr("Face Recognition"),
+                                     tr("Cannot load %1.").arg(FileOpName));
+
+            return;
+        }
+
+    }
+    //function to load the image whenever fName is not empty
+        if( FileOpName.size() )
+        {
+        imagerd = cvLoadImage(FileOpName.toAscii().data());
+        QImage imageView = QImage((const unsigned char*)(imagerd->imageData), imagerd->width,imagerd->height,QImage::Format_RGB888).rgbSwapped();
+        ui->label->setPixmap(QPixmap::fromImage(imageView));
+        }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    openImage();
 }
