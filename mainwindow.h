@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv/highgui.h>
 #include <QFileDialog>
+using namespace cv;
 namespace Ui {
 class MainWindow;
 }
@@ -23,7 +24,8 @@ protected:
 private slots:
     void on_pushButton_clicked();
     void openImage(); //add a new openImage function to the project
-
+    void travelDirectory(const QString &);
+    int check(Mat);
 private:
     Ui::MainWindow *ui;
 };
