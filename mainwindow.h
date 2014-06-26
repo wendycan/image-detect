@@ -21,11 +21,15 @@ public:
 protected:
     QString     FileOpName; //declare FileOpName as IplImage
     IplImage*   imagerd; //declare imagerd as IplImage
+    QFileInfoList list;
 private slots:
     void on_pushButton_clicked();
     void openImage(); //add a new openImage function to the project
     void travelDirectory(const QString &);
-    int check(Mat);
+    void histogram();
+    void checkHistogram(Mat);
+    void on_pushButton_histogram_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

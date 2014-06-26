@@ -128,7 +128,7 @@ void MainWindow::travelDirectory(const QString & path){
         //error
     }
     dir.setFilter(QDir::Files|QDir::NoDotAndDotDot);
-    QFileInfoList list = dir.entryInfoList();
+    list = dir.entryInfoList();
     if(list.size()< 1 ) {
         //error
     }
@@ -136,16 +136,29 @@ void MainWindow::travelDirectory(const QString & path){
     do{
         QFileInfo file = list.at(i);
         QString filePath = file.absoluteFilePath();
-        ui->textBrowser->append(filePath);
-        QByteArray temp = filePath.toLatin1();
-        const char * filePathChar = temp.data();  //convert QString to const char *
-        Mat img = imread(filePathChar);
-        check(img);
+        QString text = QString::number(i);
+        text.append(QString(":     ")).append(filePath);
+        ui->textBrowser->append(text);
         i++;
     } while(i < list.size());
 }
-int MainWindow::check(Mat img){
-//    imshow("ori", img);
-//    img = img;
-    return 1;
+void MainWindow::histogram(){
+    int i=0;
+    do{
+        QFileInfo file = list.at(i);
+        QString filePath = file.absoluteFilePath();
+        QByteArray temp = filePath.toLatin1();
+        const char * filePathChar = temp.data();  //convert QString to const char *
+        Mat img = imread(filePathChar);
+        checkHistogram(img);
+        i++;
+    } while(i < list.size());
+}
+void MainWindow::checkHistogram(Mat img){
+
+}
+
+void MainWindow::on_pushButton_histogram_clicked()
+{
+    histogram();
 }
