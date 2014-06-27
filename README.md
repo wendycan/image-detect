@@ -1,6 +1,6 @@
 img-detect
 ==========
-#Dependencies
 
-*QT
-*OpenCV
+##Dependencies
+* QT
+* OpenCV
