@@ -63,6 +63,16 @@
      <string>目标识别</string>
     </property>
    </widget>
+   <widget class="QTextBrowser" name="textBrowserHist">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>30</y>
+      <width>241</width>
+      <height>361</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

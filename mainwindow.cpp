@@ -149,13 +149,34 @@ void MainWindow::histogram(){
         QString filePath = file.absoluteFilePath();
         QByteArray temp = filePath.toLatin1();
         const char * filePathChar = temp.data();  //convert QString to const char *
-        Mat img = imread(filePathChar);
-        checkHistogram(img);
+        Mat img = imread(filePathChar, 0);
+//        imwrite("/Users/mac/Desktop/demo.jpg", img);
+        float range[] = {0,255};
+
+        const float* histRange = { range };
+
+//        CvHistogram* gray_hist = cvCreateHist(1,&hist_size,CV_HIST_ARRAY,ranges,1);
+        Mat hist;
+        Mat hsv;
+//        cvtColor(img, hsv, CV_BGR2HSV);
+        int hist_size = 255;
+        int channels[] = {0};
+        calcHist(&img, 1, channels, Mat(), hist, 1, &hist_size, &histRange, true, false);
+//        normalize(hist, hist, 0, 1);
+        for( int i = 0; i < hist_size; i++ ){
+            float v = hist.at<float>(i);
+            QString text = QString::number(i);
+            text.append(QString(":")).append(QString::number(v));
+             ui->textBrowserHist->append(text);
+        }
+//        cvNormalizeHist(hist, 1.0);
+//        cvNormalizeHist(hist,1.0);
+//        checkHistogram(hist);
         i++;
     } while(i < list.size());
 }
 void MainWindow::checkHistogram(Mat img){
-
+    img = img;
 }
 
 void MainWindow::on_pushButton_histogram_clicked()
