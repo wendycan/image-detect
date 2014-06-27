@@ -11,20 +11,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    count = 0;
     ui->setupUi(this);
-//    Mat image = imread("/Users/mac/Desktop/demo.jpg");
-
-//    cvtColor(image,image,CV_BGR2GRAY);
 
     /* == 边缘检测 == */
 //    Mat image2;
 //    Canny(image,image2,10,100);
 //    threshold(image2,image2,128,255,CV_THRESH_BINARY);
 
-    /* == 滤波处理 == */
-//    Mat image1;
-//    blur(image,image1,Size(5,5));
-//    GaussianBlur(image, image1, Size(5,5),1.5);
 
 //    Mat w = Mat(650, 1300, CV_8UC3);
 //    Mat left(w,Rect(0,0,650,650));
@@ -46,30 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //    Canny(image,image1,10,100);
 //    threshold(image1,image1,128,255,CV_THRESH_BINARY);
 
-    /* == 二值化 ==*/
-//    Mat image1;
-//    float temp;
-//    for(int i=0;i<image.rows;i++){
-//        for(int j=0;j<image.cols;j++){
-//            temp = image.at<float>(i,j);
-//        }
-//    }
-//    threshold(image,image1,220,255,CV_THRESH_BINARY);
-
-//    namedWindow("origion", CV_WINDOW_AUTOSIZE);
-//    imshow("origion", w);
-//    QImage qimage = mat2qimage(image);
-//    QImage qimage1 = mat2qimage(image1);
-
-//    namedWindow("addfilter", CV_WINDOW_AUTOSIZE);
-//    resizeWindow("addfilter", 500,500);
-//    imshow("addfilter", im3);
-
-//    namedWindow("direct", CV_WINDOW_AUTOSIZE);
-//    resizeWindow("direct", 500,500);
-//    imshow("direct", image2);
-
-//    waitKey(50000);
     /* == 直线检测 == */
 //    cv::vector<cv::Vec4i> lines;
 //    cv::HoughLinesP(image2,lines,1,CV_PI/180,80,50,10);
@@ -87,40 +57,15 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-void MainWindow::openImage()
-{
-    //declare FileOpName as the choosen opened file name
-     QString dir = QFileDialog::getExistingDirectory(this,
-                                    tr("Open Directory"), QDir::currentPath());
-    travelDirectory(dir);
-    //Check if FileOpName exist or not
-//    if (!FileOpName.isEmpty()) {
-//        QImage image(FileOpName);
-//        if (image.isNull()) {
-//            QMessageBox::information(this, tr("Face Recognition"),
-//                                     tr("Cannot load %1.").arg(FileOpName));
-
-//            return;
-//        }
-
-//    }
-    //function to load the image whenever fName is not empty
-//        if( FileOpName.size() )
-//        {
-//        imagerd = cvLoadImage(FileOpName.toAscii().data());
-//        QImage imageView = QImage((const unsigned char*)(imagerd->imageData), imagerd->width,imagerd->height,QImage::Format_RGB888).rgbSwapped();
-//        ui->label->setPixmap(QPixmap::fromImage(imageView));
-//        Mat image = imread("/Users/mac/Desktop/demo.jpg");
-//        namedWindow("my window", CV_WINDOW_NORMAL);
-//        resizeWindow("my window", 500,500);
-//        imshow("my window", image);
-//        waitKey(50000);
-//        }
-}
-
 void MainWindow::on_pushButton_clicked()
 {
     openImage();
+}
+void MainWindow::openImage()
+{
+    QString dir = QFileDialog::getExistingDirectory(this,
+                                    tr("Open Directory"), QDir::currentPath());
+    travelDirectory(dir);
 }
 void MainWindow::travelDirectory(const QString & path){
     QDir dir(path);
@@ -142,38 +87,21 @@ void MainWindow::travelDirectory(const QString & path){
         i++;
     } while(i < list.size());
 }
-void MainWindow::histogram(){
-    int i=0;
-    do{
-        QFileInfo file = list.at(i);
-        QString filePath = file.absoluteFilePath();
-        QByteArray temp = filePath.toLatin1();
-        const char * filePathChar = temp.data();  //convert QString to const char *
-        Mat img = imread(filePathChar, 0);
-//        imwrite("/Users/mac/Desktop/demo.jpg", img);
-        float range[] = {0,255};
-
-        const float* histRange = { range };
-
-//        CvHistogram* gray_hist = cvCreateHist(1,&hist_size,CV_HIST_ARRAY,ranges,1);
-        Mat hist;
-        Mat hsv;
-//        cvtColor(img, hsv, CV_BGR2HSV);
-        int hist_size = 255;
-        int channels[] = {0};
-        calcHist(&img, 1, channels, Mat(), hist, 1, &hist_size, &histRange, true, false);
-//        normalize(hist, hist, 0, 1);
-        for( int i = 0; i < hist_size; i++ ){
-            float v = hist.at<float>(i);
-            QString text = QString::number(i);
-            text.append(QString(":")).append(QString::number(v));
-             ui->textBrowserHist->append(text);
-        }
-//        cvNormalizeHist(hist, 1.0);
-//        cvNormalizeHist(hist,1.0);
-//        checkHistogram(hist);
-        i++;
-    } while(i < list.size());
+int MainWindow::histogram(Mat img){
+    float range[] = {0,255};
+    const float* histRange = { range };
+    Mat hist;
+    Mat hsv;
+    int hist_size = 255;
+    int channels[] = {0};
+    calcHist(&img, 1, channels, Mat(), hist, 1, &hist_size, &histRange, true, false);
+    float result = hist.at<float>(0);
+    ui->textBrowserHist->append(QString::number(result));
+    if(result < 495000){
+        ui->textBrowserHist->append(QString("Not Passed!"));
+        return -1;
+    }
+    return 1;
 }
 void MainWindow::checkHistogram(Mat img){
     img = img;
@@ -181,5 +109,73 @@ void MainWindow::checkHistogram(Mat img){
 
 void MainWindow::on_pushButton_histogram_clicked()
 {
-    histogram();
+    int i=0;
+    do{
+        QFileInfo file = list.at(i);
+        QString filePath = file.absoluteFilePath();
+        QByteArray temp = filePath.toLatin1();
+        const char * filePathChar = temp.data();  //convert QString to const char *
+        Mat img = imread(filePathChar, 0);
+        Mat img1;
+
+        GaussianBlur(img, img1, Size(9, 9), 2, 2 );
+        img1 = removeCircle(img1, 963, 1305, 900);
+
+        threshold(img1, img1, 7, 255, 1);
+
+        QString result_path = "/Users/mac/Desktop/result/img-";
+        result_path.append(QString::number(i)).append(QString(".jpg"));
+        QByteArray t_result_path = result_path.toLatin1();
+        const char * r_result_path = t_result_path.data();
+        imwrite(r_result_path, img1);
+
+        for ( int i = 1; i < 10; i = i + 2 ){
+            medianBlur(img1, img1, i);
+        }
+//        vector<Vec3f> circles;
+//        HoughCircles(img1, circles, CV_HOUGH_GRADIENT, 1, img1.rows/8, 200, 22, 0, 0 );
+
+//        for ( int i = 1; i < 11; i = i + 2 ){
+//            medianBlur(img, img1, i);
+//        }
+
+//        for( size_t i = 0; i < circles.size(); i++ )
+//            {
+//                 Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+//                 int radius = cvRound(circles[i][2]);
+//                 // draw the circle center
+//                 circle( img1, center, 3, Scalar(100,100,100), -1, 8, 0 );
+//                 // draw the circle outline
+//                 circle( img1, center, radius, Scalar(100,100,100), 3, 8, 0 );
+//            }
+
+        int key = 0;
+        key = histogram(img1);
+        if(key == -1){
+            count++;
+            ui->textBrowserResult->append(filePath);
+            QString error_path = "/Users/mac/Desktop/result/errors/error-";
+            error_path.append(QString::number(i)).append(QString(".jpg"));
+            QByteArray t_error_path = error_path.toLatin1();
+            const char * r_error_path = t_error_path.data();
+            imwrite(r_error_path, img);
+        }
+        i++;
+     } while(i < list.size());
+    QString result = "Not Passed Count:";
+    result.append(QString::number(count));
+    ui->textBrowserResult->append(result);
+}
+Mat MainWindow::removeCircle(Mat img, int center_rows, int center_cols, int r){
+    int rows = img.rows;
+    int cols = img.cols;
+    for(int j = 0;j < rows;j++){
+        for(int k = 0;k < cols;k++){
+            int dist = (center_rows - j) * (center_rows - j) + (center_cols - k) * (center_cols - k);
+            if(dist >= r*r){
+                img.at<uchar>(j,k) = 0;
+            }
+        }
+    }
+    return img;
 }
